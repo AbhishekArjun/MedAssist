@@ -2,6 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import MedicationTracker from '../components/MedicationTracker';
 import AppointmentScheduler from '../components/AppointmentScheduler';
+import WaterIntakeTracker from '../components/WaterIntakeTracker';
+import SymptomJournal from '../components/SymptomJournal';
+import EmergencyContacts from '../components/EmergencyContacts';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -43,7 +46,7 @@ export default function Dashboard() {
 
         <section className="metrics-grid">
           {metrics.map((m, idx) => (
-            <div key={idx} className="metric-card health-panel glass-panel">
+            <div key={idx} className="metric-card health-panel glass-panel animate-card" style={{ animationDelay: `${idx * 0.1}s` }}>
               <h3>{m.label}</h3>
               <div className="metric-value">{m.value}</div>
               <div className="metric-trend trend-neutral">{m.trend}</div>
@@ -52,11 +55,15 @@ export default function Dashboard() {
         </section>
         <div className="dashboard-grid">
           <div className="dashboard-main-column" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            <section className="dashboard-medications glass-panel">
+            <section className="dashboard-medications glass-panel animate-card" style={{ animationDelay: '0.4s' }}>
               <MedicationTracker />
             </section>
+            
+            <WaterIntakeTracker />
+            
+            <SymptomJournal />
 
-            <section className="dashboard-actions">
+            <section className="dashboard-actions animate-card" style={{ animationDelay: '0.5s' }}>
               <div className="action-card health-panel cta-card glass-panel" style={{ background: 'rgba(10, 25, 47, 0.5)', borderColor: 'rgba(100, 255, 218, 0.2)' }}>
                 <h2 style={{ color: '#E6F1FF' }}>Need medical advice?</h2>
                 <p>Our HIPAA-compliant AI medical assistant is here to help safely triage your concerns.</p>
@@ -65,8 +72,9 @@ export default function Dashboard() {
             </section>
           </div>
 
-          <div className="dashboard-side-column">
+          <div className="dashboard-side-column animate-card" style={{ animationDelay: '0.6s', display: 'flex', flexDirection: 'column', gap: '32px' }}>
             <AppointmentScheduler />
+            <EmergencyContacts />
           </div>
         </div>
       </main>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import ChatContainer from './components/ChatContainer';
 import Login from './pages/Login';
@@ -30,18 +30,19 @@ const ChatWrapper = () => (
 );
 
 function AppContent() {
-  const [quote, setQuote] = useState("");
+  const [quote] = useState(() => affirmations[Math.floor(Math.random() * affirmations.length)]);
   const location = useLocation();
-
-  useEffect(() => {
-    setQuote(affirmations[Math.floor(Math.random() * affirmations.length)]);
-  }, []);
 
   // Only show the affirmation on the Chat and Dashboard, not auth pages
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
   return (
     <>
+      {!isAuthPage && quote && (
+        <div className="daily-affirmation">
+          <p>"{quote}"</p>
+        </div>
+      )}
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />

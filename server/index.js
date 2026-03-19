@@ -1,37 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import { getLlama, LlamaChatSession } from 'node-llama-cpp';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-const MODEL_PATH = path.join(__dirname, '..', 'models', 'health_chatbot.Q4_K_M.gguf');
-
-// Initialize llama instance
-let llama;
-let model;
-let context;
-
-async function initLlama() {
-  try {
-    console.log("Loading GGUF model from:", MODEL_PATH);
-    llama = await getLlama();
-    model = await llama.loadModel({ modelPath: MODEL_PATH });
-    context = await model.createContext();
-    console.log("Model loaded successfully!");
-  } catch (err) {
-    console.error("Failed to load model. Will use fallback clinical AI:", err.message);
-  }
-}
-
-// Start loading the model asynchronously
-initLlama();
 
 app.post('/api/chat', async (req, res) => {
   const { messages } = req.body;
@@ -44,21 +16,6 @@ app.post('/api/chat', async (req, res) => {
   const promptText = lastUserMessage ? lastUserMessage.text.toLowerCase() : "hello";
 
   console.log("Triage Request:", promptText);
-
-  // Try using real AI if loaded
-  if (context) {
-    try {
-      const session = new LlamaChatSession({
-        contextSequence: context.getSequence(),
-        systemPrompt: "You are MedAssist, a professional clinical AI assistant."
-      });
-      const response = await session.prompt(promptText);
-      return res.json({ text: response });
-    } catch (error) {
-      console.error("Llama generation error, falling back to mock:", error.message);
-      // Fall through to mock logic below
-    }
-  }
 
   // Fallback Mock Logic (Clinical Triage)
   let responseText = "Thank you for reaching out. Based on your symptoms, I recommend monitoring your condition and staying hydrated. If symptoms persist for more than 48 hours, please consult a physician.";
