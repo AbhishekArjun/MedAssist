@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
+import { generateWellnessResponse } from '../utils/mockAi';
 
 export default function ChatContainer() {
   const [messages, setMessages] = useState([
@@ -108,17 +109,20 @@ export default function ChatContainer() {
       
     } catch (error) {
       console.error("AI fetch error:", error);
-      const errorMsg = `Error connecting to medical database! Details: ${error.message}`;
-      setMessages(prev => [
-        ...prev, 
-        {
-          id: (Date.now() + 1).toString(),
-          text: errorMsg,
-          sender: 'bot',
-          timestamp: new Date()
-        }
-      ]);
-      speakText("Error connecting to medical database.");
+      
+      // FALLBACK LOGIC: Use the local mock AI if the server is unreachable
+      const fallbackText = generateWellnessResponse(text);
+      const botResponse = `${fallbackText}\n\n*(Note: I'm currently in offline mode as the clinical database is unreachable)*`;
+
+      const newBotMsg = {
+        id: (Date.now() + 1).toString(),
+        text: botResponse,
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, newBotMsg]);
+      speakText(newBotMsg.text);
     } finally {
       setIsTyping(false);
     }

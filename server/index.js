@@ -12,22 +12,42 @@ app.post('/api/chat', async (req, res) => {
     return res.status(400).json({ error: "Messages array is required" });
   }
 
-  const lastUserMessage = messages.filter(m => m.sender === 'user').pop();
-  const promptText = lastUserMessage ? lastUserMessage.text.toLowerCase() : "hello";
+  const lastUserMessage = messages.slice().reverse().find(m => m.sender === 'user');
+  const promptText = lastUserMessage ? lastUserMessage.text.toLowerCase().trim() : "hello";
 
   console.log("Triage Request:", promptText);
 
   // Fallback Mock Logic (Clinical Triage)
-  let responseText = "Thank you for reaching out. Based on your symptoms, I recommend monitoring your condition and staying hydrated. If symptoms persist for more than 48 hours, please consult a physician.";
+  let responseText = "I understand you're concerned about your symptoms. Could you provide more details? For most mild symptoms, rest and hydration are recommended. Please consult a doctor for persistent issues.";
   
-  if (promptText.includes("headache") || promptText.includes("migraine")) {
-    responseText = "For a headache, rest in a quiet, dark room. You may take over-the-counter pain relievers like ibuprofen or acetaminophen according to package instructions. Seek emergency care if it is the worst headache of your life or accompanied by vision changes.";
-  } else if (promptText.includes("fever") || promptText.includes("temp")) {
-    responseText = "A fever is a sign your body is fighting off an infection. Rest and drink plenty of fluids. If your temperature exceeds 103°F (39.4°C) or lasts more than 3 days, please schedule an appointment.";
-  } else if (promptText.includes("stomach") || promptText.includes("nausea")) {
-    responseText = "For gastrointestinal discomfort, try the BRAT diet (bananas, rice, applesauce, toast) and sip clear liquids. Avoid dairy and greasy foods until you feel better.";
-  } else if (promptText.includes("hello") || promptText.includes("hi")) {
-    responseText = "Hello. I am the MedAssist triage AI. Briefly describe your symptoms so I can provide relevant general guidance.";
+  const rules = [
+    { 
+      keywords: ["headache", "migraine", "dizzy"], 
+      response: "For a headache or dizziness, rest in a quiet, dark room. Stay hydrated and avoid screens. If it's the worst headache of your life or accompanied by confusion or vision changes, seek emergency care immediately."
+    },
+    { 
+      keywords: ["fever", "temp", "chills", "sweat"], 
+      response: "A fever is often a sign of infection. Rest and drink plenty of fluids. You can monitor your temperature using a thermometer. If it exceeds 103°F (39.4°C) or lasts more than 3 days, please see a healthcare provider."
+    },
+    { 
+      keywords: ["stomach", "nausea", "vomit", "cramp", "pain"], 
+      response: "For abdominal discomfort or nausea, try sipping clear liquids and stick to bland foods (the BRAT diet). Avoid heavy or spicy foods. Seek medical attention for severe, localized pain or persistent vomiting."
+    },
+    { 
+      keywords: ["cough", "cold", "flu", "sore throat", "congestion"], 
+      response: "For cold and flu symptoms, rest and hydration are vital. Humidifiers and warm liquids can help soothe a sore throat or congestion. If you experience difficulty breathing, seek help immediately."
+    },
+    { 
+      keywords: ["hello", "hi", "hey", "help", "greet"], 
+      response: "Hello! I am the MedAssist triage AI. I can help provide general guidance based on your symptoms. How are you feeling today?"
+    }
+  ];
+
+  for (const rule of rules) {
+    if (rule.keywords.some(k => promptText.includes(k))) {
+      responseText = rule.response;
+      break;
+    }
   }
 
   // Simulate network delay for realism
