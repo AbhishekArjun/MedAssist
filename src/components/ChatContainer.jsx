@@ -81,7 +81,9 @@ export default function ChatContainer() {
     setIsTyping(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/chat', {
+      // Use dynamic hostname to avoid DNS conflicts between localhost, 127.0.0.1, and [::1]
+      const hostname = window.location.hostname === '0.0.0.0' ? '127.0.0.1' : window.location.hostname;
+      const response = await fetch(`http://${hostname}:3001/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: [...messages, newUserMsg] })
@@ -112,7 +114,11 @@ export default function ChatContainer() {
       
       // FALLBACK LOGIC: Use the local mock AI if the server is unreachable
       const fallbackText = generateWellnessResponse(text);
-      const botResponse = `${fallbackText}\n\n*(Note: I'm currently in offline mode as the clinical database is unreachable)*`;
+      const isClinical = ['fever', 'headache', 'nausea', 'vomit', 'cough', 'cold', 'flu', 'sore throat', 'pain'].some(s => text.toLowerCase().includes(s));
+      
+      const botResponse = isClinical 
+        ? `${fallbackText}\n\n*(Safety Note: I am currently in offline triage mode. Seek professional care for persistent symptoms)*`
+        : `${fallbackText}\n\n*(Note: Health database is currently offline)*`;
 
       const newBotMsg = {
         id: (Date.now() + 1).toString(),

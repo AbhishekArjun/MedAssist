@@ -38,8 +38,14 @@ MedAssist is a high-fidelity, secure AI-powered medical triage and wellness dash
    npm install
    ```
 
-3. **Run the application**:
-   Start both the frontend and the AI server simultaneously:
+3. **Configure Environment**:
+   Create a `.env` file in the root directory and add your Groq API key:
+   ```env
+   GROQ_API_KEY=your_api_key_here
+   ```
+
+4. **Run the application**:
+   Start both the frontend and the AI server:
    ```bash
    npm run start:all
    ```

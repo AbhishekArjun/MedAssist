@@ -39,6 +39,30 @@ const responses = [
       "Consistency is key when it comes to wellness. Are you making sure your goals are realistic and attainable?",
       "Make sure you're finding joy in the movement or dietary changes you make, otherwise it won't be sustainable."
     ]
+  },
+  {
+    keywords: ['headache', 'migraine', 'dizzy'],
+    responses: [
+      "For a headache or dizziness, rest in a quiet, dark room. Stay hydrated and avoid screens. If it's the worst headache of your life or accompanied by confusion, seek emergency care."
+    ]
+  },
+  {
+    keywords: ['fever', 'temp', 'chills', 'sweat'],
+    responses: [
+      "A fever is often a sign of infection. Rest and drink plenty of fluids. If it exceeds 103°F (39.4°C) or lasts more than 3 days, please see a healthcare provider."
+    ]
+  },
+  {
+    keywords: ['stomach', 'nausea', 'vomit', 'cramp', 'pain'],
+    responses: [
+      "For abdominal discomfort, try sipping clear liquids and stick to bland foods. Seek medical attention for severe, localized pain or persistent vomiting."
+    ]
+  },
+  {
+    keywords: ['cough', 'cold', 'flu', 'sore throat', 'congestion'],
+    responses: [
+      "For cold and flu symptoms, rest and hydration are vital. If you experience difficulty breathing, seek help immediately."
+    ]
   }
 ];
 
