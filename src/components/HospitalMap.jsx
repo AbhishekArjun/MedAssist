@@ -37,7 +37,12 @@ const HospitalMap = () => {
           </div>
         ))}
       </div>
-      <button className="map-btn">Open Full Navigation</button>
+      <button 
+        className="map-btn" 
+        onClick={() => window.open('https://www.google.com/maps/search/hospitals+near+me', '_blank')}
+      >
+        Open Full Navigation
+      </button>
     </div>
   );
 };

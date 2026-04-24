@@ -120,7 +120,7 @@ export default function ChatContainer() {
       const isClinical = ['fever', 'headache', 'nausea', 'vomit', 'cough', 'cold', 'flu', 'sore throat', 'pain'].some(s => text.toLowerCase().includes(s));
       
       const botResponse = isClinical 
-        ? `${fallbackText}\n\n*(Safety Note: I am currently in offline triage mode. Seek professional care for persistent symptoms)*`
+        ? `${fallbackText}\n\n*(Diagnostic Note: Backend connection failed. Running in offline triage mode. Error: ${error.message})*`
         : `${fallbackText}\n\n*(Note: Health database is currently offline)*`;
 
       const newBotMsg = {

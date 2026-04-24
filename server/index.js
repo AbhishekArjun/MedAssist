@@ -11,8 +11,9 @@ if (fs.existsSync(envPath)) {
   const envContent = fs.readFileSync(envPath, 'utf8');
   envContent.split('\n').forEach(line => {
     const [key, ...value] = line.split('=');
-    if (key && value) process.env[key.trim()] = value.join('=').trim();
+    if (key && value.length > 0) process.env[key.trim()] = value.join('=').trim();
   });
+  console.log("Configuration Loaded. Groq Key found:", process.env.GROQ_API_KEY ? "Yes" : "No");
 }
 
 const app = express();
@@ -62,19 +63,30 @@ app.post('/api/chat', async (req, res) => {
         })
       });
 
-      const data = await groqResponse.json();
-      if (data.choices && data.choices[0]) {
-        let fullText = data.choices[0].message.content;
-        let suggestions = ["Tell me more", "What are the risks?"];
-        
-        if (fullText.includes("SUGGESTIONS:")) {
-          const parts = fullText.split("SUGGESTIONS:");
-          fullText = parts[0].trim();
-          suggestions = parts[1].split(";").map(s => s.trim()).filter(s => s.length > 0);
+        let data;
+        try {
+          data = await groqResponse.json();
+        } catch (e) {
+          throw new Error("Failed to parse Groq JSON response");
         }
 
-        return res.json({ text: fullText, suggestions });
-      }
+        if (data.error) {
+          throw new Error(`Groq API Error: ${data.error.message || JSON.stringify(data.error)}`);
+        }
+
+        if (data.choices && data.choices[0]) {
+          let fullText = data.choices[0].message.content;
+          let suggestions = ["Tell me more", "What are the risks?"];
+          
+          if (fullText.includes("SUGGESTIONS:")) {
+            const parts = fullText.split("SUGGESTIONS:");
+            fullText = parts[0].trim();
+            suggestions = parts[1].split(";").map(s => s.trim().replace(/^[\s*-]+/, '')).filter(s => s.length > 0);
+          }
+
+          console.log("Groq Success:", fullText.substring(0, 50) + "...");
+          return res.json({ text: fullText, suggestions: suggestions.slice(0, 3) });
+        }
     } catch (error) {
       console.error("Groq API Error, falling back to local rules:", error);
     }
