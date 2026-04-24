@@ -50,7 +50,7 @@ app.post('/api/chat', async (req, res) => {
           messages: [
             {
               role: "system",
-              content: "You are MedAssist, a professional clinical triage AI. Your goal is to analyze symptoms and provide safe, accurate medical guidance. Always include a disclaimer that you are an AI and not a doctor. If symptoms sound life-threatening, advise immediate emergency care."
+              content: "You are MedAssist, a professional clinical triage AI. Analyze symptoms and provide safe guidance. Format your response clearly. At the end of your response, provide exactly 2 brief follow-up questions the user might want to ask, prefixed with 'SUGGESTIONS:' followed by a semicolon-separated list."
             },
             ...messages.map(m => ({
                role: m.sender === 'bot' ? 'assistant' : 'user',
@@ -64,7 +64,16 @@ app.post('/api/chat', async (req, res) => {
 
       const data = await groqResponse.json();
       if (data.choices && data.choices[0]) {
-        return res.json({ text: data.choices[0].message.content });
+        let fullText = data.choices[0].message.content;
+        let suggestions = ["Tell me more", "What are the risks?"];
+        
+        if (fullText.includes("SUGGESTIONS:")) {
+          const parts = fullText.split("SUGGESTIONS:");
+          fullText = parts[0].trim();
+          suggestions = parts[1].split(";").map(s => s.trim()).filter(s => s.length > 0);
+        }
+
+        return res.json({ text: fullText, suggestions });
       }
     } catch (error) {
       console.error("Groq API Error, falling back to local rules:", error);

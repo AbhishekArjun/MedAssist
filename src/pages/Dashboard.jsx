@@ -5,16 +5,18 @@ import AppointmentScheduler from '../components/AppointmentScheduler';
 import WaterIntakeTracker from '../components/WaterIntakeTracker';
 import SymptomJournal from '../components/SymptomJournal';
 import EmergencyContacts from '../components/EmergencyContacts';
+import WellnessTimeline from '../components/WellnessTimeline';
+import HospitalMap from '../components/HospitalMap';
 
 export default function Dashboard() {
   const navigate = useNavigate();
 
   // Clinical data for dashboard
   const metrics = [
-    { label: "Heart Rate", value: "72 bpm", trend: "Normal" },
-    { label: "Blood Pressure", value: "118/75", trend: "-2 mmHg" },
-    { label: "Sleep Last Night", value: "7.5 hrs", trend: "Optimal" },
-    { label: "Upcoming Appts", value: "1", trend: "Oct 24" },
+    { label: "Heart Rate", value: "72", unit: "bpm", trend: "Normal", icon: "❤️" },
+    { label: "Blood Pressure", value: "118/75", unit: "", trend: "-2 mmHg", icon: "🩸" },
+    { label: "Sleep Last Night", value: "7.5", unit: "hrs", trend: "Optimal", icon: "🌙" },
+    { label: "Daily Hydration", value: "1.8", unit: "L", trend: "Goal: 2.5L", icon: "💧", progress: 72 },
   ];
 
   return (
@@ -47,9 +49,22 @@ export default function Dashboard() {
         <section className="metrics-grid">
           {metrics.map((m, idx) => (
             <div key={idx} className="metric-card health-panel glass-panel animate-card" style={{ animationDelay: `${idx * 0.1}s` }}>
-              <h3>{m.label}</h3>
-              <div className="metric-value">{m.value}</div>
-              <div className="metric-trend trend-neutral">{m.trend}</div>
+              <div className="metric-header">
+                <h3>{m.label}</h3>
+                <span className={m.label === "Heart Rate" ? "pulse-icon" : ""}>{m.icon}</span>
+              </div>
+              <div className="metric-value">
+                {m.value} <span className="unit-label">{m.unit}</span>
+              </div>
+              {m.progress !== undefined ? (
+                <div className="hydration-progress-container">
+                  <div className="hydration-bar" style={{ width: `${m.progress}%` }}></div>
+                </div>
+              ) : (
+                <div className={`metric-trend ${m.trend === 'Normal' || m.trend === 'Optimal' ? 'trend-stable' : 'trend-neutral'}`}>
+                  {m.trend}
+                </div>
+              )}
             </div>
           ))}
         </section>
@@ -62,6 +77,8 @@ export default function Dashboard() {
             <WaterIntakeTracker />
             
             <SymptomJournal />
+            
+            <WellnessTimeline />
 
             <section className="dashboard-actions animate-card" style={{ animationDelay: '0.5s' }}>
               <div className="action-card health-panel cta-card glass-panel" style={{ background: 'rgba(10, 25, 47, 0.5)', borderColor: 'rgba(100, 255, 218, 0.2)' }}>
@@ -73,6 +90,7 @@ export default function Dashboard() {
           </div>
 
           <div className="dashboard-side-column animate-card" style={{ animationDelay: '0.6s', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <HospitalMap />
             <AppointmentScheduler />
             <EmergencyContacts />
           </div>

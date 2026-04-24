@@ -13,6 +13,7 @@ export default function ChatContainer() {
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -99,6 +100,8 @@ export default function ChatContainer() {
          throw new Error(data.error);
       }
 
+      setSuggestions(data.suggestions || []);
+
       const newBotMsg = {
         id: (Date.now() + 1).toString(),
         text: data.text || "I'm having trouble retrieving medical data right now.",
@@ -128,6 +131,7 @@ export default function ChatContainer() {
       };
       
       setMessages(prev => [...prev, newBotMsg]);
+      setSuggestions(["What else should I do?", "When to see a doctor?"]);
       speakText(newBotMsg.text);
     } finally {
       setIsTyping(false);
@@ -179,6 +183,24 @@ export default function ChatContainer() {
             <div className="typing-dot"></div>
           </div>
         )}
+        
+        {!isTyping && suggestions.length > 0 && (
+          <div className="ai-suggestions hide-on-print">
+            {suggestions.map((theory, idx) => (
+              <button 
+                key={idx} 
+                className="suggestion-chip" 
+                onClick={() => {
+                  handleSendMessage(theory);
+                  setSuggestions([]);
+                }}
+              >
+                {theory}
+              </button>
+            ))}
+          </div>
+        )}
+        
         <div ref={messagesEndRef} />
       </div>
       <div className="hide-on-print">

@@ -105,7 +105,326 @@ body {
   overflow: hidden;
 }
 
-/* Cyber accent line for auth card */
+/* Cyber-Clinical Enhancements 2.0 */
+
+@keyframes heartbeat {
+  0% { transform: scale(1); opacity: 1; }
+  15% { transform: scale(1.15); opacity: 0.9; }
+  30% { transform: scale(1); opacity: 1; }
+  45% { transform: scale(1.15); opacity: 0.9; }
+  60% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.pulse-icon {
+  color: #ff4d4d;
+  display: inline-block;
+  margin-right: 8px;
+  animation: heartbeat 1.2s infinite ease-in-out;
+}
+
+.hydration-progress-container {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 10px;
+  position: relative;
+}
+
+.hydration-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #64ffda, #48cae4);
+  transition: width 0.5s ease-out;
+  box-shadow: 0 0 10px rgba(100, 255, 218, 0.5);
+}
+
+.metric-card.animate-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.metric-card.animate-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 32px rgba(100, 255, 218, 0.15);
+}
+
+.severity-tag {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ai-suggestions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.suggestion-chip {
+  background: rgba(100, 255, 218, 0.05);
+  border: 1px solid rgba(100, 255, 218, 0.2);
+  color: #64ffda;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.suggestion-chip:hover {
+  background: rgba(100, 255, 218, 0.15);
+  border-color: #64ffda;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(100, 255, 218, 0.1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Wellness Timeline Aesthetics */
+.wellness-timeline-container {
+  padding: 24px;
+}
+
+.timeline-header {
+  margin-bottom: 24px;
+}
+
+.timeline-header h3 {
+  color: #64ffda;
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.timeline-header p {
+  color: #8892b0;
+  font-size: 0.85rem;
+}
+
+.timeline-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 80px 40px 1fr;
+  align-items: flex-start;
+}
+
+.timeline-date {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  padding-top: 4px;
+}
+
+.timeline-date .day {
+  color: #ccd6f6;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.timeline-date .time {
+  color: #8892b0;
+  font-size: 0.75rem;
+}
+
+.timeline-status-dot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  z-index: 2;
+  margin-top: 8px;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.timeline-line {
+  width: 2px;
+  flex-grow: 1;
+  background: rgba(100, 255, 218, 0.1);
+  margin: 4px 0;
+}
+
+.timeline-content {
+  padding: 0 0 24px 12px;
+}
+
+.timeline-content h4 {
+  color: #ccd6f6;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+/* Medical Glossary Tooltips */
+.medical-term {
+  border-bottom: 1px dotted #64ffda;
+  color: #64ffda;
+  cursor: help;
+  position: relative;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.medical-term:hover::after {
+  content: attr(data-definition);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 25, 47, 0.95);
+  color: #ccd6f6;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  width: 220px;
+  z-index: 100;
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+  font-weight: normal;
+  line-height: 1.4;
+}
+
+.medical-term:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 115%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(100, 255, 218, 0.3);
+  z-index: 101;
+}
+/* Hospital Locator & Mock Map */
+.hospital-map-container {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mock-map-visual {
+  height: 180px;
+  background: rgba(10, 25, 47, 0.4);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(100, 255, 218, 0.1);
+  background-image: 
+    linear-gradient(rgba(100, 255, 218, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100, 255, 218, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.user-location-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  background: #64ffda;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 15px #64ffda;
+}
+
+.facility-marker {
+  position: absolute;
+  color: #ff4d4d;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.marker-0 { top: 20%; left: 30%; }
+.marker-1 { top: 70%; left: 80%; }
+.marker-2 { top: 40%; left: 75%; }
+
+.marker-ping {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 77, 77, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ping 2s infinite;
+}
+
+@keyframes ping {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+
+.facilities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.facility-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.facility-info h4 {
+  color: #ccd6f6;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.facility-info p {
+  color: #8892b0;
+  font-size: 0.75rem;
+}
+
+.emergency-badge {
+  background: #ff4d4d;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.map-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #64ffda;
+  color: #64ffda;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.map-btn:hover {
+  background: rgba(100, 255, 218, 0.1);
+}
 .auth-card::before {
   content: '';
   position: absolute;
