@@ -94,23 +94,69 @@ export default function ChatContainer() {
         throw new Error("Server error - " + response.statusText);
       }
 
-      const data = await response.json();
-      
-      if (data.error) {
-         throw new Error(data.error);
+      const contentType = response.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        
+        setSuggestions(data.suggestions || []);
+        const newBotMsg = {
+          id: (Date.now() + 1).toString(),
+          text: data.text || "I'm having trouble retrieving medical data right now.",
+          sender: 'bot',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, newBotMsg]);
+        speakText(newBotMsg.text);
+      } else {
+        // Streaming mode
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let botText = '';
+        const botMsgId = (Date.now() + 1).toString();
+        
+        setMessages(prev => [...prev, {
+          id: botMsgId,
+          text: '',
+          sender: 'bot',
+          timestamp: new Date()
+        }]);
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n').filter(line => line.trim() !== '');
+          for (const line of lines) {
+            if (line.includes('[DONE]')) break;
+            if (line.startsWith('data: ')) {
+               try {
+                 const dataObj = JSON.parse(line.replace(/^data: /, ''));
+                 if (dataObj.content) {
+                   botText += dataObj.content;
+                   setMessages(prev => prev.map(msg => 
+                     msg.id === botMsgId ? { ...msg, text: botText } : msg
+                   ));
+                   scrollToBottom();
+                 }
+               } catch(e) {}
+            }
+          }
+        }
+        
+        if (botText.includes('SUGGESTIONS:')) {
+           const parts = botText.split('SUGGESTIONS:');
+           botText = parts[0].trim();
+           const suggestions = parts[1].split(';').map(s => s.trim().replace(/^[\s*-]+/, '')).filter(s => s.length > 0);
+           setSuggestions(suggestions.slice(0, 3));
+           setMessages(prev => prev.map(msg => 
+             msg.id === botMsgId ? { ...msg, text: botText } : msg
+           ));
+        }
+        
+        speakText(botText);
       }
-
-      setSuggestions(data.suggestions || []);
-
-      const newBotMsg = {
-        id: (Date.now() + 1).toString(),
-        text: data.text || "I'm having trouble retrieving medical data right now.",
-        sender: 'bot',
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, newBotMsg]);
-      speakText(newBotMsg.text);
       
     } catch (error) {
       console.error("AI fetch error:", error);

@@ -59,34 +59,44 @@ app.post('/api/chat', async (req, res) => {
             }))
           ],
           temperature: 0.5,
-          max_tokens: 500
+          max_tokens: 500,
+          stream: true
         })
       });
 
-        let data;
-        try {
-          data = await groqResponse.json();
-        } catch (e) {
-          throw new Error("Failed to parse Groq JSON response");
-        }
+      if (!groqResponse.ok) {
+        throw new Error(`Groq API Error: ${groqResponse.statusText}`);
+      }
 
-        if (data.error) {
-          throw new Error(`Groq API Error: ${data.error.message || JSON.stringify(data.error)}`);
-        }
+      res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      });
 
-        if (data.choices && data.choices[0]) {
-          let fullText = data.choices[0].message.content;
-          let suggestions = ["Tell me more", "What are the risks?"];
-          
-          if (fullText.includes("SUGGESTIONS:")) {
-            const parts = fullText.split("SUGGESTIONS:");
-            fullText = parts[0].trim();
-            suggestions = parts[1].split(";").map(s => s.trim().replace(/^[\s*-]+/, '')).filter(s => s.length > 0);
+      const decoder = new TextDecoder('utf-8');
+      for await (const chunk of groqResponse.body) {
+        const decoded = decoder.decode(chunk, { stream: true });
+        const lines = decoded.split('\n').filter(line => line.trim() !== '');
+        for (const line of lines) {
+          if (line.includes('[DONE]')) {
+            res.write(`data: [DONE]\n\n`);
+            return res.end();
           }
-
-          console.log("Groq Success:", fullText.substring(0, 50) + "...");
-          return res.json({ text: fullText, suggestions: suggestions.slice(0, 3) });
+          if (line.startsWith('data: ')) {
+            try {
+              const parsed = JSON.parse(line.replace(/^data: /, ''));
+              if (parsed.choices && parsed.choices[0].delta && parsed.choices[0].delta.content) {
+                res.write(`data: ${JSON.stringify({ content: parsed.choices[0].delta.content })}\n\n`);
+              }
+            } catch (e) {
+              // Ignore partial JSON
+            }
+          }
         }
+      }
+      res.end();
+      return;
     } catch (error) {
       console.error("Groq API Error, falling back to local rules:", error);
     }
